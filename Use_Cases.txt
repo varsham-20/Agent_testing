@@ -4,13 +4,3 @@ def get_user():
     query = f"SELECT * FROM users WHERE username = '{username}'"
     cursor.execute(query)
     return cursor.fetchall()
-
-String dbPassword = "Admin@123";
-
-
-document.getElementById("output").innerHTML = userInput;
-
-
-app.post('/upload', (req, res) => {
-  fs.writeFileSync(`uploads/${req.files.file.name}`, req.files.file.data);
-});
