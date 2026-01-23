@@ -290,7 +290,7 @@ class Hotel
         System.out.println("\n*******");
         System.out.println(" Bill:-");
         System.out.println("*******");
-               
+              
         switch(rtype)
         {
             case 1:
@@ -565,7 +565,7 @@ public class Main {
             case 6:break x;
                 
         }
-           
+          
             System.out.println("\nContinue : (y/n)");
             wish=sc.next().charAt(0); 
             if(!(wish=='y'||wish=='Y'||wish=='n'||wish=='N'))
