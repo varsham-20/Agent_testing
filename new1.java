@@ -5,14 +5,12 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Scanner;
 
 class Food implements Serializable
 {
     int itemno;
-    int quantity;   
+    int quantity;  
     float price;
     
     Food(int itemno,int quantity)
@@ -36,7 +34,7 @@ class Singleroom implements Serializable
 {
     String name;
     String contact;
-    String gender;   
+    String gender;  
     ArrayList<Food> food =new ArrayList<>();
 
    
@@ -55,7 +53,7 @@ class Doubleroom extends Singleroom implements Serializable
 { 
     String name2;
     String contact2;
-    String gender2;  
+    String gender2; 
     
     Doubleroom()
     {
@@ -81,91 +79,12 @@ class NotAvailable extends Exception
     }
 }
 
-// Customer class for standalone customer management
-class Customer implements Serializable {
-    String id;
-    String name;
-    String contact;
-    String gender;
-    Integer roomNumber; // Associated room number if any
-    Customer(String id, String name, String contact, String gender, Integer roomNumber) {
-        this.id = id;
-        this.name = name;
-        this.contact = contact;
-        this.gender = gender;
-        this.roomNumber = roomNumber;
-    }
-}
-
-// CustomerManager for CRUD operations
-class CustomerManager implements Serializable {
-    private Map<String, Customer> customers = new HashMap<>();
-    // Add customer
-    public boolean addCustomer(String id, String name, String contact, String gender, Integer roomNumber) {
-        if (!validateCustomer(name, contact, gender)) {
-            System.out.println("Validation failed: Name, contact, and gender are required.");
-            return false;
-        }
-        if (customers.containsKey(id)) {
-            System.out.println("Customer with ID already exists.");
-            return false;
-        }
-        customers.put(id, new Customer(id, name, contact, gender, roomNumber));
-        System.out.println("Customer added successfully.");
-        return true;
-    }
-    // Retrieve customer
-    public Customer getCustomer(String id) {
-        return customers.get(id);
-    }
-    // Update customer
-    public boolean updateCustomer(String id, String name, String contact, String gender, Integer roomNumber) {
-        if (!customers.containsKey(id)) {
-            System.out.println("Customer not found.");
-            return false;
-        }
-        if (!validateCustomer(name, contact, gender)) {
-            System.out.println("Validation failed: Name, contact, and gender are required.");
-            return false;
-        }
-        customers.put(id, new Customer(id, name, contact, gender, roomNumber));
-        System.out.println("Customer updated successfully.");
-        return true;
-    }
-    // Delete customer
-    public boolean deleteCustomer(String id) {
-        if (customers.remove(id) != null) {
-            System.out.println("Customer deleted successfully.");
-            return true;
-        }
-        System.out.println("Customer not found.");
-        return false;
-    }
-    // List all customers
-    public void listCustomers() {
-        if (customers.isEmpty()) {
-            System.out.println("No customers found.");
-            return;
-        }
-        for (Customer c : customers.values()) {
-            System.out.println("ID: " + c.id + ", Name: " + c.name + ", Contact: " + c.contact + ", Gender: " + c.gender + ", Room: " + (c.roomNumber != null ? c.roomNumber : "-") );
-        }
-    }
-    // Validation
-    private boolean validateCustomer(String name, String contact, String gender) {
-        return name != null && !name.isEmpty() &&
-               contact != null && !contact.isEmpty() &&
-               gender != null && !gender.isEmpty();
-    }
-}
-
 class holder implements Serializable
 {
     Doubleroom luxury_doublerrom[]=new Doubleroom[10]; //Luxury
     Doubleroom deluxe_doublerrom[]=new Doubleroom[20]; //Deluxe
     Singleroom luxury_singleerrom[]=new Singleroom[10]; //Luxury
     Singleroom deluxe_singleerrom[]=new Singleroom[20]; //Deluxe
-    CustomerManager customerManager = new CustomerManager();
 }
 
 class Hotel
@@ -191,15 +110,9 @@ class Hotel
         contact2=sc.next();
         System.out.print("Enter gender: ");
         gender2 = sc.next();
-        }      
-        // Store customer in manager
-        String customerId = "CUST"+System.currentTimeMillis();
-        hotel_ob.customerManager.addCustomer(customerId, name, contact, gender, getRoomNumber(i, rn));
-        if(i<3 && name2!=null) {
-            String customerId2 = "CUST"+(System.currentTimeMillis()+1);
-            hotel_ob.customerManager.addCustomer(customerId2, name2, contact2, gender2, getRoomNumber(i, rn));
-        }
-        switch (i) {
+        }     
+        
+          switch (i) {
             case 1:hotel_ob.luxury_doublerrom[rn]=new Doubleroom(name,contact,gender,name2,contact2,gender2);
                 break;
             case 2:hotel_ob.deluxe_doublerrom[rn]=new Doubleroom(name,contact,gender,name2,contact2,gender2);
@@ -212,13 +125,7 @@ class Hotel
                 break;
         }
     }
-    static Integer getRoomNumber(int i, int rn) {
-        if(i==1) return rn+1;
-        if(i==2) return rn+11;
-        if(i==3) return rn+31;
-        if(i==4) return rn+41;
-        return null;
-    }
+    
     static void bookroom(int i)
     {
         int j;
@@ -319,55 +226,7 @@ class Hotel
         }
         System.out.println("Room Booked");
     }
-    // --- Customer CRUD Menu ---
-    static void customerMenu() {
-        Scanner sc = new Scanner(System.in);
-        int op;
-        do {
-            System.out.println("\nCustomer Management Menu:\n1. Add Customer\n2. Retrieve Customer\n3. Update Customer\n4. Delete Customer\n5. List All Customers\n6. Back");
-            op = sc.nextInt();
-            sc.nextLine();
-            switch(op) {
-                case 1:
-                    System.out.print("Enter ID: "); String id = sc.nextLine();
-                    System.out.print("Enter name: "); String name = sc.nextLine();
-                    System.out.print("Enter contact: "); String contact = sc.nextLine();
-                    System.out.print("Enter gender: "); String gender = sc.nextLine();
-                    System.out.print("Enter room number (or 0 if none): "); int room = sc.nextInt(); sc.nextLine();
-                    hotel_ob.customerManager.addCustomer(id, name, contact, gender, room==0?null:room);
-                    break;
-                case 2:
-                    System.out.print("Enter ID: "); id = sc.nextLine();
-                    Customer c = hotel_ob.customerManager.getCustomer(id);
-                    if (c != null) {
-                        System.out.println("ID: "+c.id+", Name: "+c.name+", Contact: "+c.contact+", Gender: "+c.gender+", Room: "+(c.roomNumber!=null?c.roomNumber:"-"));
-                    } else {
-                        System.out.println("Customer not found.");
-                    }
-                    break;
-                case 3:
-                    System.out.print("Enter ID: "); id = sc.nextLine();
-                    System.out.print("Enter new name: "); name = sc.nextLine();
-                    System.out.print("Enter new contact: "); contact = sc.nextLine();
-                    System.out.print("Enter new gender: "); gender = sc.nextLine();
-                    System.out.print("Enter new room number (or 0 if none): "); room = sc.nextInt(); sc.nextLine();
-                    hotel_ob.customerManager.updateCustomer(id, name, contact, gender, room==0?null:room);
-                    break;
-                case 4:
-                    System.out.print("Enter ID: "); id = sc.nextLine();
-                    hotel_ob.customerManager.deleteCustomer(id);
-                    break;
-                case 5:
-                    hotel_ob.customerManager.listCustomers();
-                    break;
-                case 6:
-                    break;
-                default:
-                    System.out.println("Invalid option.");
-            }
-        } while(op!=6);
-    }
-    // --- End Customer CRUD Menu ---
+    
     static void features(int i)
     {
         switch (i) {
@@ -500,11 +359,11 @@ class Hotel
         int j;
         char w;
         switch (rtype) {
-            case 1:               
+            case 1:              
                 if(hotel_ob.luxury_doublerrom[rn]!=null)
-                    System.out.println("Room used by "+hotel_ob.luxury_doublerrom[rn].name);                
+                    System.out.println("Room used by "+hotel_ob.luxury_doublerrom[rn].name);               
                 else 
-                {    
+                {   
                     System.out.println("Empty Already");
                         return;
                 }
@@ -520,9 +379,9 @@ class Hotel
                 break;
             case 2:
                 if(hotel_ob.deluxe_doublerrom[rn]!=null)
-                    System.out.println("Room used by "+hotel_ob.deluxe_doublerrom[rn].name);                
+                    System.out.println("Room used by "+hotel_ob.deluxe_doublerrom[rn].name);               
                 else 
-                {    
+                {   
                     System.out.println("Empty Already");
                         return;
                 }
@@ -538,9 +397,9 @@ class Hotel
                 break;
             case 3:
                 if(hotel_ob.luxury_singleerrom[rn]!=null)
-                    System.out.println("Room used by "+hotel_ob.luxury_singleerrom[rn].name);                
+                    System.out.println("Room used by "+hotel_ob.luxury_singleerrom[rn].name);               
                 else 
-                 {    
+                 {   
                     System.out.println("Empty Already");
                         return;
                 }
@@ -556,9 +415,9 @@ class Hotel
                 break;
             case 4:
                 if(hotel_ob.deluxe_singleerrom[rn]!=null)
-                    System.out.println("Room used by "+hotel_ob.deluxe_singleerrom[rn].name);                
+                    System.out.println("Room used by "+hotel_ob.deluxe_singleerrom[rn].name);               
                 else 
-                 {    
+                 {   
                     System.out.println("Empty Already");
                         return;
                 }
@@ -597,11 +456,11 @@ class Hotel
             case 3: hotel_ob.luxury_singleerrom[rn].food.add(new Food(i,q));
                 break;
             case 4: hotel_ob.deluxe_singleerrom[rn].food.add(new Food(i,q));
-                break;                                                 
+                break;                                                
         }
               System.out.println("Do you want to order anything else ? (y/n)");
               wish=sc.next().charAt(0); 
-        }while(wish=='y'||wish=='Y');  
+        }while(wish=='y'||wish=='Y'); 
         }
          catch(NullPointerException e)
             {
@@ -632,7 +491,7 @@ class write implements Runnable
         catch(Exception e)
         {
             System.out.println("Error in writing "+e);
-        }         
+        }        
         
     }
     
@@ -642,7 +501,7 @@ public class Main {
     public static void main(String[] args){
         
         try
-        {           
+        {          
         File f = new File("backup");
         if(f.exists())
         {
@@ -656,7 +515,7 @@ public class Main {
         x:
         do{
 
-        System.out.println("\nEnter your choice :\n1.Display room details\n2.Display room availability \n3.Book\n4.Order food\n5.Checkout\n6.Customer Management\n7.Exit\n");
+        System.out.println("\nEnter your choice :\n1.Display room details\n2.Display room availability \n3.Book\n4.Order food\n5.Checkout\n6.Exit\n");
         ch = sc.nextInt();
         switch(ch){
             case 1: System.out.println("\nChoose room type :\n1.Luxury Double Room \n2.Deluxe Double Room \n3.Luxury Single Room \n4.Deluxe Single Room\n");
@@ -669,7 +528,7 @@ public class Main {
                 break;
             case 3:System.out.println("\nChoose room type :\n1.Luxury Double Room \n2.Deluxe Double Room \n3.Luxury Single Room\n4.Deluxe Single Room\n");
                      ch2 = sc.nextInt();
-                     Hotel.bookroom(ch2);                     
+                     Hotel.bookroom(ch2);                    
                 break;
             case 4:
                  System.out.print("Room Number -");
@@ -687,7 +546,7 @@ public class Main {
                      else
                          System.out.println("Room doesn't exist");
                      break;
-            case 5:                 
+            case 5:                
                 System.out.print("Room Number -");
                      ch2 = sc.nextInt();
                      if(ch2>60)
@@ -703,10 +562,7 @@ public class Main {
                      else
                          System.out.println("Room doesn't exist");
                      break;
-            case 6:
-                Hotel.customerMenu();
-                break;
-            case 7:break x;
+            case 6:break x;
                 
         }
            
@@ -719,11 +575,11 @@ public class Main {
                 wish=sc.next().charAt(0); 
             }
             
-        }while(wish=='y'||wish=='Y');    
+        }while(wish=='y'||wish=='Y');   
         
         Thread t=new Thread(new write(Hotel.hotel_ob));
         t.start();
-        }        
+        }       
             catch(Exception e)
             {
                 System.out.println("Not a valid input");
