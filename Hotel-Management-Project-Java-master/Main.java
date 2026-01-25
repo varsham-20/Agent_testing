@@ -264,17 +264,13 @@ class Hotel
                 break;
             case 3:
                 for(j=0;j<hotel_ob.luxury_singleerrom.length;j++)
-                {
                     if(hotel_ob.luxury_singleerrom[j]==null)
                         count++;
-                }
                 break;
             case 4:
                 for(j=0;j<hotel_ob.deluxe_singleerrom.length;j++)
-                {
                     if(hotel_ob.deluxe_singleerrom[j]==null)
                         count++;
-                }
                 break;
             default:
                 System.out.println("Enter valid option");
