@@ -264,17 +264,13 @@ class Hotel
                 break;
             case 3:
                 for(j=0;j<hotel_ob.luxury_singleerrom.length;j++)
-                {
                     if(hotel_ob.luxury_singleerrom[j]==null)
                         count++;
-                }
                 break;
             case 4:
                 for(j=0;j<hotel_ob.deluxe_singleerrom.length;j++)
-                {
                     if(hotel_ob.deluxe_singleerrom[j]==null)
                         count++;
-                }
                 break;
             default:
                 System.out.println("Enter valid option");
@@ -487,27 +483,39 @@ class write implements Runnable
         FileOutputStream fout=new FileOutputStream("backup");
         ObjectOutputStream oos=new ObjectOutputStream(fout);
         oos.writeObject(hotel_ob);
-        }
-        catch(Exception e)
-        {
+        oos.close();
+        fout.close();
+        } catch(Exception e) {
             System.out.println("Error in writing "+e);
         }         
-        
     }
-    
 }
 
 public class Main {
     public static void main(String[] args){
-        
-        try
-        {           
-        File f = new File("backup");
-        if(f.exists())
-        {
-            FileInputStream fin=new FileInputStream(f);
-            ObjectInputStream ois=new ObjectInputStream(fin);
-            Hotel.hotel_ob=(holder)ois.readObject();
+        holder loadedHotelOb = null;
+        boolean fileCorrupted = false;
+        try {
+            File f = new File("backup");
+            if(f.exists()) {
+                try {
+                    FileInputStream fin = new FileInputStream(f);
+                    ObjectInputStream ois = new ObjectInputStream(fin);
+                    loadedHotelOb = (holder)ois.readObject();
+                    ois.close();
+                    fin.close();
+                } catch(Exception e) {
+                    System.out.println("Backup file is corrupted. Starting with fresh state.");
+                    fileCorrupted = true;
+                }
+            }
+        } catch(Exception e) {
+            System.out.println("Error accessing backup file: " + e.getMessage());
+        }
+        if(loadedHotelOb != null && !fileCorrupted) {
+            Hotel.hotel_ob = loadedHotelOb;
+        } else {
+            Hotel.hotel_ob = new holder();
         }
         Scanner sc = new Scanner(System.in);
         int ch,ch2;
@@ -579,10 +587,10 @@ public class Main {
         
         Thread t=new Thread(new write(Hotel.hotel_ob));
         t.start();
-        }        
-            catch(Exception e)
-            {
-                System.out.println("Not a valid input");
-            }
+        try {
+            t.join();
+        } catch (InterruptedException e) {
+            System.out.println("Error waiting for backup thread: " + e.getMessage());
+        }
     }
 }
