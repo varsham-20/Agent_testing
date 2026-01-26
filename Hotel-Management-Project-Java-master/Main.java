@@ -17,19 +17,7 @@ class Food implements Serializable
     {
         this.itemno=itemno;
         this.quantity=quantity;
-        switch(itemno)
-        {
-            case 1:price=quantity*50;
-                break;
-            case 2:price=quantity*60;
-                break;
-            case 3:price=quantity*70;
-                break;
-            case 4:price=quantity*30;
-                break;
-        }
-    }
-}
+        
 class Singleroom implements Serializable
 {
     String name;
@@ -487,27 +475,39 @@ class write implements Runnable
         FileOutputStream fout=new FileOutputStream("backup");
         ObjectOutputStream oos=new ObjectOutputStream(fout);
         oos.writeObject(hotel_ob);
-        }
-        catch(Exception e)
-        {
+        oos.close();
+        fout.close();
+        } catch(Exception e) {
             System.out.println("Error in writing "+e);
         }         
-        
     }
-    
 }
 
 public class Main {
     public static void main(String[] args){
-        
-        try
-        {           
-        File f = new File("backup");
-        if(f.exists())
-        {
-            FileInputStream fin=new FileInputStream(f);
-            ObjectInputStream ois=new ObjectInputStream(fin);
-            Hotel.hotel_ob=(holder)ois.readObject();
+        holder loadedHotelOb = null;
+        boolean fileCorrupted = false;
+        try {
+            File f = new File("backup");
+            if(f.exists()) {
+                try {
+                    FileInputStream fin = new FileInputStream(f);
+                    ObjectInputStream ois = new ObjectInputStream(fin);
+                    loadedHotelOb = (holder)ois.readObject();
+                    ois.close();
+                    fin.close();
+                } catch(Exception e) {
+                    System.out.println("Backup file is corrupted. Starting with fresh state.");
+                    fileCorrupted = true;
+                }
+            }
+        } catch(Exception e) {
+            System.out.println("Error accessing backup file: " + e.getMessage());
+        }
+        if(loadedHotelOb != null && !fileCorrupted) {
+            Hotel.hotel_ob = loadedHotelOb;
+        } else {
+            Hotel.hotel_ob = new holder();
         }
         Scanner sc = new Scanner(System.in);
         int ch,ch2;
@@ -579,10 +579,10 @@ public class Main {
         
         Thread t=new Thread(new write(Hotel.hotel_ob));
         t.start();
-        }        
-            catch(Exception e)
-            {
-                System.out.println("Not a valid input");
-            }
+        try {
+            t.join();
+        } catch (InterruptedException e) {
+            System.out.println("Error waiting for backup thread: " + e.getMessage());
+        }
     }
 }
