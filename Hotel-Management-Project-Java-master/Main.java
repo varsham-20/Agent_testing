@@ -78,6 +78,18 @@ class NotAvailable extends Exception
         return "Not Available !";
     }
 }
+// Custom exception for invalid input
+class InvalidBookingInputException extends Exception {
+    private String message;
+    public InvalidBookingInputException(String message) {
+        super(message);
+        this.message = message;
+    }
+    @Override
+    public String toString() {
+        return message;
+    }
+}
 
 class holder implements Serializable
 {
@@ -91,28 +103,33 @@ class Hotel
 {
     static holder hotel_ob=new holder();
     static Scanner sc = new Scanner(System.in);
-    static void CustDetails(int i,int rn)
+    static void CustDetails(int i,int rn) throws InvalidBookingInputException
     {
         String name, contact, gender;
         String name2 = null, contact2 = null; 
         String gender2="";
         System.out.print("\nEnter customer name: ");
         name = sc.next();
+        if (name == null || name.trim().isEmpty()) throw new InvalidBookingInputException("Customer name cannot be empty.");
         System.out.print("Enter contact number: ");
         contact=sc.next();
+        if (contact == null || contact.trim().isEmpty()) throw new InvalidBookingInputException("Contact number cannot be empty.");
         System.out.print("Enter gender: ");
         gender = sc.next();
+        if (gender == null || gender.trim().isEmpty()) throw new InvalidBookingInputException("Gender cannot be empty.");
         if(i<3)
         {
-        System.out.print("Enter second customer name: ");
-        name2 = sc.next();
-        System.out.print("Enter contact number: ");
-        contact2=sc.next();
-        System.out.print("Enter gender: ");
-        gender2 = sc.next();
+            System.out.print("Enter second customer name: ");
+            name2 = sc.next();
+            if (name2 == null || name2.trim().isEmpty()) throw new InvalidBookingInputException("Second customer name cannot be empty.");
+            System.out.print("Enter contact number: ");
+            contact2=sc.next();
+            if (contact2 == null || contact2.trim().isEmpty()) throw new InvalidBookingInputException("Second contact number cannot be empty.");
+            System.out.print("Enter gender: ");
+            gender2 = sc.next();
+            if (gender2 == null || gender2.trim().isEmpty()) throw new InvalidBookingInputException("Second gender cannot be empty.");
         }      
-        
-          switch (i) {
+        switch (i) {
             case 1:hotel_ob.luxury_doublerrom[rn]=new Doubleroom(name,contact,gender,name2,contact2,gender2);
                 break;
             case 2:hotel_ob.deluxe_doublerrom[rn]=new Doubleroom(name,contact,gender,name2,contact2,gender2);
@@ -142,16 +159,23 @@ class Hotel
                 }
                 System.out.print("\nEnter room number: ");
                 try{
-                rn=sc.nextInt();
-                rn--;
-                if(hotel_ob.luxury_doublerrom[rn]!=null)
-                    throw new NotAvailable();
-                CustDetails(i,rn);
+                    rn=sc.nextInt();
+                    rn--;
+                    if (rn < 0 || rn >= hotel_ob.luxury_doublerrom.length) throw new InvalidBookingInputException("Room number out of range.");
+                    if(hotel_ob.luxury_doublerrom[rn]!=null)
+                        throw new NotAvailable();
+                    CustDetails(i,rn);
+                    System.out.println("Room Booked");
+                }
+                catch(NotAvailable e) {
+                    System.out.println("Error: Room already occupied. " + e.toString());
+                }
+                catch(InvalidBookingInputException e) {
+                    System.out.println("Booking Error: " + e.toString());
                 }
                 catch(Exception e)
                 {
                     System.out.println("Invalid Option");
-                    return;
                 }
                 break;
             case 2:
@@ -164,16 +188,23 @@ class Hotel
                 }
                 System.out.print("\nEnter room number: ");
                 try{
-                rn=sc.nextInt();
-                rn=rn-11;
-                if(hotel_ob.deluxe_doublerrom[rn]!=null)
-                    throw new NotAvailable();
-                CustDetails(i,rn);
+                    rn=sc.nextInt();
+                    rn=rn-11;
+                    if (rn < 0 || rn >= hotel_ob.deluxe_doublerrom.length) throw new InvalidBookingInputException("Room number out of range.");
+                    if(hotel_ob.deluxe_doublerrom[rn]!=null)
+                        throw new NotAvailable();
+                    CustDetails(i,rn);
+                    System.out.println("Room Booked");
+                }
+                catch(NotAvailable e) {
+                    System.out.println("Error: Room already occupied. " + e.toString());
+                }
+                catch(InvalidBookingInputException e) {
+                    System.out.println("Booking Error: " + e.toString());
                 }
                 catch(Exception e)
                 {
                     System.out.println("Invalid Option");
-                    return;
                 }
                 break;
             case 3:
@@ -186,16 +217,23 @@ class Hotel
                 }
                 System.out.print("\nEnter room number: ");
                 try{
-                rn=sc.nextInt();
-                rn=rn-31;
-                if(hotel_ob.luxury_singleerrom[rn]!=null)
-                    throw new NotAvailable();
-                CustDetails(i,rn);
+                    rn=sc.nextInt();
+                    rn=rn-31;
+                    if (rn < 0 || rn >= hotel_ob.luxury_singleerrom.length) throw new InvalidBookingInputException("Room number out of range.");
+                    if(hotel_ob.luxury_singleerrom[rn]!=null)
+                        throw new NotAvailable();
+                    CustDetails(i,rn);
+                    System.out.println("Room Booked");
+                }
+                catch(NotAvailable e) {
+                    System.out.println("Error: Room already occupied. " + e.toString());
+                }
+                catch(InvalidBookingInputException e) {
+                    System.out.println("Booking Error: " + e.toString());
                 }
                 catch(Exception e)
                 {
                     System.out.println("Invalid Option");
-                    return;
                 }
                 break;
             case 4:
@@ -208,25 +246,31 @@ class Hotel
                 }
                 System.out.print("\nEnter room number: ");
                 try{
-                rn=sc.nextInt();
-                rn=rn-41;
-                if(hotel_ob.deluxe_singleerrom[rn]!=null)
-                    throw new NotAvailable();
-                CustDetails(i,rn);
+                    rn=sc.nextInt();
+                    rn=rn-41;
+                    if (rn < 0 || rn >= hotel_ob.deluxe_singleerrom.length) throw new InvalidBookingInputException("Room number out of range.");
+                    if(hotel_ob.deluxe_singleerrom[rn]!=null)
+                        throw new NotAvailable();
+                    CustDetails(i,rn);
+                    System.out.println("Room Booked");
+                }
+                catch(NotAvailable e) {
+                    System.out.println("Error: Room already occupied. " + e.toString());
+                }
+                catch(InvalidBookingInputException e) {
+                    System.out.println("Booking Error: " + e.toString());
                 }
                 catch(Exception e)
                 {
-                   System.out.println("Invalid Option");
-                    return;
+                    System.out.println("Invalid Option");
                 }
                 break;
             default:
                 System.out.println("Enter valid option");
                 break;
         }
-        System.out.println("Room Booked");
     }
-    
+    // features, availability, bill, deallocate, order methods remain unchanged
     static void features(int i)
     {
         switch (i) {
@@ -243,7 +287,6 @@ class Hotel
                 break;
         }
     }
-    
     static void availability(int i)
     {
       int j,count=0;
@@ -282,7 +325,6 @@ class Hotel
         }
         System.out.println("Number of rooms available : "+count);
     }
-    
     static void bill(int rn,int rtype)
     {
         double amount=0;
@@ -353,7 +395,6 @@ class Hotel
         }
         System.out.println("\nTotal Amount- "+amount);
     }
-    
     static void deallocate(int rn,int rtype)
     {
         int j;
@@ -435,7 +476,6 @@ class Hotel
                 break;
         }
     }
-    
     static void order(int rn,int rtype)
     {
         int i,q;
