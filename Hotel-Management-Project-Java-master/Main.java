@@ -38,10 +38,6 @@ class Singleroom implements Serializable
     ArrayList<Food> food =new ArrayList<>();
 
    
-    Singleroom()
-    {
-        this.name="";
-    }
     Singleroom(String name,String contact,String gender)
     {
         this.name=name;
@@ -487,27 +483,39 @@ class write implements Runnable
         FileOutputStream fout=new FileOutputStream("backup");
         ObjectOutputStream oos=new ObjectOutputStream(fout);
         oos.writeObject(hotel_ob);
-        }
-        catch(Exception e)
-        {
+        oos.close();
+        fout.close();
+        } catch(Exception e) {
             System.out.println("Error in writing "+e);
         }         
-        
     }
-    
 }
 
 public class Main {
     public static void main(String[] args){
-        
-        try
-        {           
-        File f = new File("backup");
-        if(f.exists())
-        {
-            FileInputStream fin=new FileInputStream(f);
-            ObjectInputStream ois=new ObjectInputStream(fin);
-            Hotel.hotel_ob=(holder)ois.readObject();
+        holder loadedHotelOb = null;
+        boolean fileCorrupted = false;
+        try {
+            File f = new File("backup");
+            if(f.exists()) {
+                try {
+                    FileInputStream fin = new FileInputStream(f);
+                    ObjectInputStream ois = new ObjectInputStream(fin);
+                    loadedHotelOb = (holder)ois.readObject();
+                    ois.close();
+                    fin.close();
+                } catch(Exception e) {
+                    System.out.println("Backup file is corrupted. Starting with fresh state.");
+                    fileCorrupted = true;
+                }
+            }
+        } catch(Exception e) {
+            System.out.println("Error accessing backup file: " + e.getMessage());
+        }
+        if(loadedHotelOb != null && !fileCorrupted) {
+            Hotel.hotel_ob = loadedHotelOb;
+        } else {
+            Hotel.hotel_ob = new holder();
         }
         Scanner sc = new Scanner(System.in);
         int ch,ch2;
@@ -546,25 +554,7 @@ public class Main {
                      else
                          System.out.println("Room doesn't exist");
                      break;
-            case 5:                 
-                System.out.print("Room Number -");
-                     ch2 = sc.nextInt();
-                     if(ch2>60)
-                         System.out.println("Room doesn't exist");
-                     else if(ch2>40)
-                         Hotel.deallocate(ch2-41,4);
-                     else if(ch2>30)
-                         Hotel.deallocate(ch2-31,3);
-                     else if(ch2>10)
-                         Hotel.deallocate(ch2-11,2);
-                     else if(ch2>0)
-                         Hotel.deallocate(ch2-1,1);
-                     else
-                         System.out.println("Room doesn't exist");
-                     break;
-            case 6:break x;
-                
-        }
+          }
            
             System.out.println("\nContinue : (y/n)");
             wish=sc.next().charAt(0); 
@@ -579,10 +569,10 @@ public class Main {
         
         Thread t=new Thread(new write(Hotel.hotel_ob));
         t.start();
-        }        
-            catch(Exception e)
-            {
-                System.out.println("Not a valid input");
-            }
+        try {
+            t.join();
+        } catch (InterruptedException e) {
+            System.out.println("Error waiting for backup thread: " + e.getMessage());
+        }
     }
 }
